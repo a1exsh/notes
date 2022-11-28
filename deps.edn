@@ -1,0 +1,8 @@
+{:paths ["dev" "notebooks" "resources"]
+ :deps {io.github.nextjournal/clerk           {:mvn/version "0.10.562"}
+        io.github.nextjournal/clerk-slideshow {:git/sha "ea9b27e5ec2e5ad57e889060521451ed9138325b"}
+
+        org.clojure/math.combinatorics        {:mvn/version "0.1.6"}
+
+        ;; we use SICMUtils for symbolic computation:
+        sicmutils/sicmutils                   {:mvn/version "0.22.0"}}}
