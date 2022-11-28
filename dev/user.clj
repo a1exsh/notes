@@ -16,6 +16,7 @@
 
   ;; or call `clerk/show!` explicitly
   (clerk/show! "notebooks/four_twos.clj")
+  (clerk/show! "notebooks/literal_compare.clj")
 
   ;;(clerk/show! "index.md")
   )
