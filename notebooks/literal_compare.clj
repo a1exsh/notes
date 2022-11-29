@@ -26,17 +26,11 @@
    [(sqrt (literal-number b)) (literal-number a)]
    [(sqrt (literal-number b)) (sqrt (literal-number 3))]])
 
-;; There must be a better way of doing that, I've just not found it yet:
-(defn literal-value [x]
-  (if (xp/literal? x)
-    (.-expression x)
-    x))
-
 (->> comparisons
      (map (fn [[l r :as c]]
             (let [cc (try
-                       (corecmp (literal-value l)
-                                (literal-value r))
+                       (corecmp (xp/expression-of l)
+                                (xp/expression-of r))
                        (catch Exception ex nil))
 
                   vc (try
