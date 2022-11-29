@@ -1,3 +1,3 @@
 # My note(book)s
 
-Notes hopefully useful for later.
+[Notes](https://github.clerk.garden/a1exsh/notes) hopefully useful for later.
