@@ -1,5 +1,5 @@
 {:paths ["dev" "notebooks" "resources"]
- :deps {io.github.nextjournal/clerk     {:mvn/version "0.15.957"}
+ :deps {io.github.nextjournal/clerk     {:git/sha "01d8ecce5d5d6c4a6ce94b0e0138c4b79bd219ff"}
         ;; io.github.nextjournal/clerk-slideshow {:git/sha "ea9b27e5ec2e5ad57e889060521451ed9138325b"}
 
         org.clojure/math.combinatorics  {:mvn/version "0.1.6"}
