@@ -12,20 +12,16 @@
             [sicmutils.env :as e :refer :all]
             [sicmutils.expression :as xp]
             [sicmutils.expression.render :as xr])
-  (:import [java.nio.file Paths Files]
-           [javax.imageio ImageIO]))
+  (:import [javax.imageio ImageIO]))
 
 ;;
 ;; First, we will need a function for doing the concatenation of two (long)
 ;; numbers.  Let's call it `long-cat`:
 ;;
 ^{:nextjournal.clerk/visibility {:code :hide}}
-(with-open [in (->> ["resources/long-cat.jpg"]
-                    into-array
-                    (Paths/get "")
-                    Files/readAllBytes
-                    io/input-stream)]
+(with-open [in (io/input-stream "resources/long-cat.jpg")]
   (ImageIO/read in))
+
 
 (defn long-cat [x y]
   (Long/valueOf (str (.toString x)
