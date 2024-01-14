@@ -1,0 +1,83 @@
+<html>
+  <head>
+    <script>
+      const sampling = 16;
+      const lightnessThreshold = 0.75;
+
+      const isDarkMode = true; // learn this somehow
+
+      window.onload = (event) => {
+          //alert("loaded");
+          const image = document.getElementById("image1");
+          const width  = image.width;
+          const height = image.height;
+
+          // don't bother with images that are to small
+          if (width * height < 64*64) {
+              return;
+          }
+
+          const canvas = new OffscreenCanvas(width, height);
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(image, 0, 0);
+
+          const imgData = ctx.getImageData(0, 0, width, height);
+          const pixels = imgData.data;
+
+          // var sw = Math.round(width  / sampling + 0.5);
+          // var sh = Math.round(height / sampling + 0.5);
+          // const sample = new Uint32Array(sw * sh);
+
+          var sampleSize = 0;
+          var sampleValue = 0;
+          var freqs = {};
+
+          // var sy = 0;
+          for (var y = 0; y < height; y += sampling) {
+              // var sx = 0;
+              for (var x = 0; x < width; x += sampling) {
+                  const pos = 4*(x + y*width);
+                  const r = pixels[pos + 0];
+                  const g = pixels[pos + 1];
+                  const b = pixels[pos + 2];
+                  // ignoring alpha for now
+
+                  const rgb = (r << 16) | (g << 8) | b;
+                  freqs[rgb] = (freqs[rgb] ?? 0) + 1;
+
+                  sampleValue += r + g + b;
+                  sampleSize++;
+                  // sx++;
+              }
+              // sy++;
+          }
+
+          const lightness = sampleValue / (3*255 * sampleSize);
+          const isImageDark = lightness < lightnessThreshold;
+
+          const isScreenshot = (Object.keys(freqs).length / sampleSize) < 0.1;
+          if (isScreenshot) {
+              if (isImageDark && !isDarkMode ||
+                  !isImageDark && isDarkMode) {
+                  image.style.setProperty("filter", "invert(100%)");
+              }
+          }
+      };
+    </script>
+  </head>
+  <body>
+    <h1>Yin & Yang</h1>
+    <p>
+      Here is some filler text.  Here is some filler text.  Here is some
+      filler text.  Here is some filler text.  Here is some filler text.  Here
+      is some filler text.  Here is some filler text.
+    </p>
+    <img id="image1"
+         src="resources/rick.jpg"
+         style="width: 75%" />
+
+    <img id="image2"
+         src="resources/screenshots/light/emacs.png"
+         style="width: 75%" />
+  </body>
+</html>
