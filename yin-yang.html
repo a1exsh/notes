@@ -2,7 +2,7 @@
 <html>
   <head>
     <script>
-      const sampling = 16;
+      const sampling = 10;
       const lightnessThreshold = 0.75;
 
       const isDarkMode = true; // learn this somehow
@@ -16,42 +16,53 @@
               return;
           }
 
-          const canvas = new OffscreenCanvas(width, height);
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(image, 0, 0);
+          const sw = Math.round(width  / sampling + 0.5);
+          const sh = Math.round(height / sampling + 0.5);
 
-          const imgData = ctx.getImageData(0, 0, width, height);
+          //const canvas = new OffscreenCanvas(sw, sw);
+          const canvas = document.getElementById("canwas");
+
+          const ctx = canvas.getContext("2d", {willReadFrequently: true});
+          ctx.imageSmoothingEnabled = false;
+
+          ctx.drawImage(image, 0, 0, width, height, 0, 0, sw, sh);
+
+          const imgData = ctx.getImageData(0, 0, sw, sh);
           const pixels = imgData.data;
 
-          var sampleSize = 0;
+          const sampleSize = sw * sh;
+          const distinctColorsThreshold = sampleSize / 10;
+          var distinctColors = 0;
           var sampleValue = 0;
-          var freqs = {};
+          var sampleColors = {};
+          var idx = 0;
 
-          for (var y = 0; y < height; y += sampling) {
-              for (var x = 0; x < width; x += sampling) {
-                  const pos = 4*(x + y*width);
-                  const r = pixels[pos + 0];
-                  const g = pixels[pos + 1];
-                  const b = pixels[pos + 2];
-                  // ignoring alpha for now
+          for (var y = 0; y < sh; ++y) {
+              for (var x = 0; x < sw; ++x) {
+                  const r = pixels[idx++];
+                  const g = pixels[idx++];
+                  const b = pixels[idx++];
+                  ++idx;                // ignoring alpha for now
 
-                  const rgb = (r << 16) | (g << 8) | b;
-                  freqs[rgb] = (freqs[rgb] ?? 0) + 1;
+                  const rgb = ((r >> 2) << 16) | ((g >> 2) << 8) | (b >> 2);
+                  if (sampleColors[rgb] === undefined) {
+                      sampleColors[rgb] = 1;
+                      if (++distinctColors > distinctColorsThreshold) {
+                          // that's likely not a screenshot, put a photo
+                          return;
+                      }
+                  }
 
                   sampleValue += r + g + b;
-                  sampleSize++;
               }
           }
 
           const lightness = sampleValue / (3*255 * sampleSize);
           const isImageDark = lightness < lightnessThreshold;
 
-          const isScreenshot = (Object.keys(freqs).length / sampleSize) < 0.1;
-          if (isScreenshot) {
-              if (isImageDark && !isDarkMode ||
-                  !isImageDark && isDarkMode) {
-                  image.style.setProperty("filter", "invert(100%)");
-              }
+          if (isImageDark && !isDarkMode ||
+              !isImageDark && isDarkMode) {
+              image.style.setProperty("filter", "invert(100%)");
           }
       }
 
@@ -64,6 +75,8 @@
   </head>
   <body>
     <h1>Yin & Yang</h1>
+    <canvas id="canwas" width="256" height="256">
+    </canvas>
     <p>
       Here is some filler text.  Here is some filler text.  Here is some
       filler text.  Here is some filler text.  Here is some filler text.  Here
@@ -74,7 +87,8 @@
       <p>
         More text here.
       </p>
-      <img src="resources/screenshots/light/emacs.png" style="width: 75%" />
+      <img src="resources/screenshots/light/emacs.png" />
+      <!-- style="width: 75%" -->
     </div>
   </body>
 </html>
