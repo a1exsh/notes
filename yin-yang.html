@@ -5,7 +5,38 @@
       const sampling = 10;
       const lightnessThreshold = 0.75;
 
-      const isDarkMode = true; // learn this somehow
+      function isDark(lightness) {
+          return lightness < lightnessThreshold;
+      }
+
+      function compositeBackgroundPixel(ctx, elt) {
+          if (elt == null) {
+              ctx.fillStyle = "white";
+              ctx.fillRect(0, 0, 1, 1);
+          } else {
+              compositeBackgroundPixel(ctx, elt.parentElement);
+
+              const style = getComputedStyle(elt);
+              const bgColor = style.getPropertyValue("background-color");
+              ctx.fillStyle = bgColor;
+              ctx.fillRect(0, 0, 1, 1);
+          }
+      }
+
+      function drawAndGetBackgroundPixel(ctx, elt) {
+          const ret = new Uint8ClampedArray(4);
+          ctx.clearRect(0, 0, 1, 1);
+
+          compositeBackgroundPixel(ctx, elt);
+          const pixel = ctx.getImageData(0, 0, 1, 1).data;
+          ret[0] = pixel[0];
+          ret[1] = pixel[1];
+          ret[2] = pixel[2];
+          ret[3] = pixel[3];
+
+          ctx.clearRect(0, 0, 1, 1);
+          return ret;
+      }
 
       function processImage(image) {
           const width  = image.width;
@@ -24,6 +55,12 @@
 
           const ctx = canvas.getContext("2d", {willReadFrequently: true});
           ctx.imageSmoothingEnabled = false;
+
+          // try early: if it fails, we spare some cycles
+          const bgPixel = drawAndGetBackgroundPixel(ctx, image);
+          const backgroundValue = bgPixel[0] + bgPixel[1] + bgPixel[2];
+          const backgroundLightness = backgroundValue / (3*255);
+          const isBackgroundDark = isDark(backgroundLightness);
 
           ctx.drawImage(image, 0, 0, width, height, 0, 0, sw, sh);
 
@@ -83,11 +120,11 @@
           };
 
           const lightness = sampleValue / (3*255 * sampleSize);
-          const isImageDark = lightness < lightnessThreshold;
+          const isImageDark = isDark(lightness);
 
           if (isScreenshot) {
-              if (isImageDark && !isDarkMode ||
-                  !isImageDark && isDarkMode) {
+              if (isImageDark && !isBackgroundDark ||
+                  !isImageDark && isBackgroundDark) {
                   turnInvertOn();
               }
           }
@@ -96,10 +133,11 @@
           const div = document.createElement("div");
           div.innerText = "☯";
           div.setAttribute("class", "yin-yang-icon");
-          div.setAttribute("title", `${isScreenshot ? '✓' : '❌'}
+          div.setAttribute("title", `${isScreenshot ? '✓ A screenshot!' : '❌ A photo?'}
 sampling=${sampling};
 distinctColors=${distinctColors}/${distinctColorsThreshold};
 lightness=${lightness.toFixed(2)};
+backgroundLightness=${backgroundLightness.toFixed(2)}
 
 Click to toggle invert.`);
           div.addEventListener("click", (event) => {
@@ -116,6 +154,9 @@ Click to toggle invert.`);
       };
     </script>
     <style>
+      body {
+          background: white;
+      }
       .yin-yang-icon {
           font-family: Arial;
           font-size: 24px;
@@ -127,8 +168,13 @@ Click to toggle invert.`);
           color: white;
           text-shadow: 2px 2px black;
           cursor: pointer;
+          display: table; /* it makes only text hovered, but why!??? */
       }
       .yin-yang-icon:hover {
+          right: -1px;
+          top: 28px;
+      }
+      .yin-yang-icon: {
           right: -1px;
           top: 28px;
       }
@@ -144,15 +190,19 @@ Click to toggle invert.`);
       filler text.  Here is some filler text.  Here is some filler text.  Here
       is some filler text.  Here is some filler text.
     </p>
-    <img src="resources/long-cat.jpg" />
-    <img src="resources/rick.jpg" />
-    <div>
+    <div style="background: rgba(0, 0, 0, 0.15)">
       <p>
         More text here.
       </p>
       <img src="resources/screenshots/dark/emacs.png" />
       <img src="resources/screenshots/light/emacs.png" />
       <!-- style="width: 75%" -->
+      <img src="1.jpg" />
+      <img src="2.jpg" />
+      <img src="3.jpg" />
+      <img src="4.jpg" />
     </div>
+    <img src="resources/long-cat.jpg" />
+    <img src="resources/rick.jpg" />
   </body>
 </html>
