@@ -1,3 +1,4 @@
+<!-- $ chromium --allow-file-access-from-files ./yin-yang.html -->
 <html>
   <head>
     <script>
@@ -6,9 +7,7 @@
 
       const isDarkMode = true; // learn this somehow
 
-      window.onload = (event) => {
-          //alert("loaded");
-          const image = document.getElementById("image1");
+      function processImage(image) {
           const width  = image.width;
           const height = image.height;
 
@@ -24,17 +23,11 @@
           const imgData = ctx.getImageData(0, 0, width, height);
           const pixels = imgData.data;
 
-          // var sw = Math.round(width  / sampling + 0.5);
-          // var sh = Math.round(height / sampling + 0.5);
-          // const sample = new Uint32Array(sw * sh);
-
           var sampleSize = 0;
           var sampleValue = 0;
           var freqs = {};
 
-          // var sy = 0;
           for (var y = 0; y < height; y += sampling) {
-              // var sx = 0;
               for (var x = 0; x < width; x += sampling) {
                   const pos = 4*(x + y*width);
                   const r = pixels[pos + 0];
@@ -47,9 +40,7 @@
 
                   sampleValue += r + g + b;
                   sampleSize++;
-                  // sx++;
               }
-              // sy++;
           }
 
           const lightness = sampleValue / (3*255 * sampleSize);
@@ -62,6 +53,12 @@
                   image.style.setProperty("filter", "invert(100%)");
               }
           }
+      }
+
+      window.onload = (_event) => {
+          for (const image of document.querySelectorAll("img")) {
+              processImage(image);
+          }
       };
     </script>
   </head>
@@ -72,12 +69,12 @@
       filler text.  Here is some filler text.  Here is some filler text.  Here
       is some filler text.  Here is some filler text.
     </p>
-    <img id="image1"
-         src="resources/rick.jpg"
-         style="width: 75%" />
-
-    <img id="image2"
-         src="resources/screenshots/light/emacs.png"
-         style="width: 75%" />
+    <img src="resources/rick.jpg" />
+    <div>
+      <p>
+        More text here.
+      </p>
+      <img src="resources/screenshots/light/emacs.png" style="width: 75%" />
+    </div>
   </body>
 </html>
