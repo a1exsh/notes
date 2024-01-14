@@ -19,8 +19,8 @@
           const sw = Math.round(width  / sampling + 0.5);
           const sh = Math.round(height / sampling + 0.5);
 
-          //const canvas = new OffscreenCanvas(sw, sw);
-          const canvas = document.getElementById("canwas");
+          const canvas = new OffscreenCanvas(sw, sh);
+          //const canvas = document.getElementById("canwas");
 
           const ctx = canvas.getContext("2d", {willReadFrequently: true});
           ctx.imageSmoothingEnabled = false;
@@ -75,8 +75,9 @@
   </head>
   <body>
     <h1>Yin & Yang</h1>
-    <canvas id="canwas" width="256" height="256">
-    </canvas>
+    <!--canvas id="canwas" width="256" height="256">
+        debugging
+    </canvas-->
     <p>
       Here is some filler text.  Here is some filler text.  Here is some
       filler text.  Here is some filler text.  Here is some filler text.  Here
