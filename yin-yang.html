@@ -149,7 +149,11 @@ Click to toggle invert.`);
 
       window.onload = (_event) => {
           for (const image of document.querySelectorAll("img")) {
-              processImage(image);
+              try {
+                  processImage(image);
+              } catch (err) {
+                  console.error("Failed to process image", image, err);
+              }
           }
       };
     </script>
@@ -196,7 +200,7 @@ Click to toggle invert.`);
       </p>
       <img src="resources/screenshots/dark/emacs.png" />
       <img src="resources/screenshots/light/emacs.png" />
-      <!-- style="width: 75%" -->
+      <!-- TODO: style="width: 75%" -->
       <img src="1.jpg" />
       <img src="2.jpg" />
       <img src="3.jpg" />
