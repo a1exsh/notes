@@ -101,16 +101,29 @@
           }
 
           var invertFilterOn = false;
-          // TODO: what about property priority?
-          const originalFilterProperty = image.style.getPropertyValue("filter");
+          const setInverted = (_event) => {
+              image.classList.add("yin-yang-inverted");
+              image.removeEventListener("animationend", setInverted);
+          };
+          const setOriginal = (_event) => {
+              image.classList.remove("yin-yang-inverted");
+              image.removeEventListener("animationend", setOriginal);
+          };
           const turnInvertOn = () => {
-              image.style.setProperty("filter", originalFilterProperty + " invert(90%)");
+              image.classList.remove("yin-yang-anim-to-original");
+              //image.classList.remove("yin-yang-anim-to-inverted");
+              image.classList.add("yin-yang-anim-to-inverted");
+              image.addEventListener("animationend", setInverted);
               invertFilterOn = true;
           };
           const turnInvertOff = () => {
-              image.style.setProperty("filter", originalFilterProperty);
+              image.classList.remove("yin-yang-inverted");
+              image.classList.remove("yin-yang-anim-to-inverted");
+              image.classList.add("yin-yang-anim-to-original");
+              image.addEventListener("animationend", setOriginal);
               invertFilterOn = false;
           };
+
           const toggleInvert = () => {
               if (invertFilterOn) {
                   turnInvertOff();
@@ -144,12 +157,12 @@ backgroundLightness=${backgroundLightness.toFixed(2)}
 
 Click to toggle invert.`);
           button.innerText = "☯";
-          button.addEventListener("click", (event) => {
+          button.addEventListener("click", (_event) => {
               toggleInvert();
-              button.classList.add("anim-rotate");
+              button.classList.add("yin-yang-anim-rotate");
           });
-          button.addEventListener("animationend", (event) => {
-              button.classList.remove("anim-rotate");
+          button.addEventListener("animationend", (_event) => {
+              button.classList.remove("yin-yang-anim-rotate");
           });
 
           image.before(div);
@@ -171,6 +184,23 @@ Click to toggle invert.`);
       .yin-yang-img-container {
           position: relative;
       }
+      .yin-yang-img-container > img.yin-yang-inverted {
+          filter: invert(90%);
+      }
+      .yin-yang-img-container > img.yin-yang-anim-to-inverted {
+          animation: yin-yang-to-inverted 1s;
+      }
+      .yin-yang-img-container > img.yin-yang-anim-to-original {
+          animation: yin-yang-to-original 1s;
+      }
+      @keyframes yin-yang-to-inverted {
+          0%   { filter: initial;     }
+          100% { filter: invert(90%); }
+      }
+      @keyframes yin-yang-to-original {
+          0%   { filter: invert(90%); }
+          100% { filter: initial;     }
+      }
       .yin-yang-toggle-button {
           position: absolute;
           right: 2px;
@@ -184,19 +214,15 @@ Click to toggle invert.`);
           height: 26px;
           cursor: pointer;
       }
-      .anim-rotate {
-          animation: rotate 1s;
+      .yin-yang-toggle-button.yin-yang-anim-rotate {
+          animation: yin-yang-rotate 1s;
       }
-      @keyframes rotate {
-          0% {
-              transform: rotate(0deg);
-          }
-          100% {
-              transform: rotate(360deg);
-          }
+      @keyframes yin-yang-rotate {
+          0%   { transform: rotate(0deg);   }
+          100% { transform: rotate(360deg); }
       }
       body {
-          background: lightgray;
+          background: darkgray;
       }
     </style>
   </head>
@@ -211,7 +237,7 @@ Click to toggle invert.`);
       is some filler text.  Here is some filler text.
     </p>
     <img src="settings.png" />
-    <div style="background: rgba(0, 0, 0, 0.15)">
+    <div style="background: rgba(255, 255, 255, 0.5)">
       <p>
         More text here.
       </p>
