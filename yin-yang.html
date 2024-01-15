@@ -3,6 +3,10 @@
   <head>
     <script>
       const sampling = 10;
+      // TODO: test gray area approach
+      // dark:  0.00 - 0.50
+      // gray:  0.50 - 0.75
+      // light: 0.75 - 1.00
       const lightnessThreshold = 0.75;
 
       function isDark(lightness) {
@@ -14,6 +18,7 @@
               ctx.fillStyle = "white";
               ctx.fillRect(0, 0, 1, 1);
           } else {
+              // TODO: test earlier that we got a fully-opaque pixel and unwind
               compositeBackgroundPixel(ctx, elt.parentElement);
 
               const style = getComputedStyle(elt);
@@ -83,6 +88,7 @@
                   const b = pixels[idx++];
                   ++idx;                // ignoring alpha for now
 
+                  // TODO: get it down to 16-bit: r >> 3, g >> 2, b >> 3
                   const rgb = ((r >> 2) << 16) | ((g >> 2) << 8) | (b >> 2);
                   if (sampleColors[rgb] === undefined) {
                       sampleColors[rgb] = 1;
@@ -149,6 +155,7 @@
 
           const button = document.createElement("span");
           button.setAttribute("class", "yin-yang-toggle-button");
+          // TODO: show a pop-up with the sample instead of using title
           button.setAttribute("title", `${isScreenshot ? '✓ A screenshot!' : '❌ A photo?'}
 sampling=${sampling};
 distinctColors=${distinctColors}/${distinctColorsThreshold};
