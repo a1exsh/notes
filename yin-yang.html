@@ -146,6 +146,10 @@ Click to toggle invert.`);
           button.innerText = "☯";
           button.addEventListener("click", (event) => {
               toggleInvert();
+              button.classList.add("anim-rotate");
+          });
+          button.addEventListener("animationend", (event) => {
+              button.classList.remove("anim-rotate");
           });
 
           image.before(div);
@@ -179,6 +183,17 @@ Click to toggle invert.`);
           width: 22px;
           height: 26px;
           cursor: pointer;
+      }
+      .anim-rotate {
+          animation: rotate 1s;
+      }
+      @keyframes rotate {
+          0% {
+              transform: rotate(0deg);
+          }
+          100% {
+              transform: rotate(360deg);
+          }
       }
       body {
           background: lightgray;
