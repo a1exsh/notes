@@ -131,20 +131,26 @@
 
           // add the icon anyway, so that the user can invert image at will
           const div = document.createElement("div");
-          div.innerText = "☯";
-          div.setAttribute("class", "yin-yang-icon");
-          div.setAttribute("title", `${isScreenshot ? '✓ A screenshot!' : '❌ A photo?'}
+          div.setAttribute("class", "yin-yang-img-container");
+          div.setAttribute("style", `width: ${width}`);
+
+          const button = document.createElement("span");
+          button.setAttribute("class", "yin-yang-toggle-button");
+          button.setAttribute("title", `${isScreenshot ? '✓ A screenshot!' : '❌ A photo?'}
 sampling=${sampling};
 distinctColors=${distinctColors}/${distinctColorsThreshold};
 lightness=${lightness.toFixed(2)};
 backgroundLightness=${backgroundLightness.toFixed(2)}
 
 Click to toggle invert.`);
-          div.addEventListener("click", (event) => {
+          button.innerText = "☯";
+          button.addEventListener("click", (event) => {
               toggleInvert();
           });
 
           image.before(div);
+          div.appendChild(image);
+          div.appendChild(button);
       }
 
       window.onload = (_event) => {
@@ -158,29 +164,24 @@ Click to toggle invert.`);
       };
     </script>
     <style>
-      body {
-          background: white;
+      .yin-yang-img-container {
+          position: relative;
       }
-      .yin-yang-icon {
+      .yin-yang-toggle-button {
+          position: absolute;
+          right: 2px;
+          top: 2px;
           font-family: Arial;
           font-size: 24px;
-          position: relative;
-          right: -2px;
-          top: 29px;
-          margin-top: -28px;
-          z-index: 100;
-          color: white;
-          text-shadow: 2px 2px black;
+          color: black;
+          background: white;
+          border-radius: 50%;
+          width: 22px;
+          height: 26px;
           cursor: pointer;
-          display: table; /* it makes only text hovered, but why!??? */
       }
-      .yin-yang-icon:hover {
-          right: -1px;
-          top: 28px;
-      }
-      .yin-yang-icon: {
-          right: -1px;
-          top: 28px;
+      body {
+          background: lightgray;
       }
     </style>
   </head>
@@ -194,6 +195,7 @@ Click to toggle invert.`);
       filler text.  Here is some filler text.  Here is some filler text.  Here
       is some filler text.  Here is some filler text.
     </p>
+    <img src="settings.png" />
     <div style="background: rgba(0, 0, 0, 0.15)">
       <p>
         More text here.
